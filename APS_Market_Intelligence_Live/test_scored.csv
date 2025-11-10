@@ -1,4 +1,4 @@
-Owner Name,Mail Address,Property Address,City,State,ZIP,EstValue,TotalLoanBal,LastLoanDate,feed_type,LTV %,Equity %,Equity_Dollars,Loan_Age_Mo,APS_Score (v2.0),APS_Tier,CCI
+﻿Owner Name,Mail Address,Property Address,City,State,ZIP,EstValue,TotalLoanBal,LastLoanDate,feed_type,LTV %,Equity %,Equity_Dollars,Loan_Age_Mo,APS_Score (v2.0),APS_Tier,CCI
 Owner 1,100 Test St,100 Main St,Durham,NC,27609,442625,285042,12/22/2019,predictive_churn,64.4,35.6,157575.0,71,44.3,Nurture,51.7
 Owner 2,101 Test St,101 Main St,Cary,NC,27601,329387,275806,09/09/2023,predictive_churn,83.73,16.27,53591.0,26,41.4,Nurture,23.0
 Owner 3,102 Test St,102 Main St,Durham,NC,27613,505278,294213,03/29/2020,predictive_churn,58.23,41.77,211055.0,68,49.0,Nurture,56.3

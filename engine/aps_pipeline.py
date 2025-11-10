@@ -4,13 +4,16 @@ APS Market Intelligence Pipeline
 Processes CSV → Normalizes → Scores → Health Check → Black Kit PDF
 """
 
-import sys
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
 
 from aps_config import INPUT_DIR, OUTPUT_DIR
-from aps_normalize import normalize_and_score
+from engine.aps_normalize import normalize_and_score
 from aps_healthcheck import health_check
 from aps_render import render_pdf
 from aps_black_kit import generate_aps_filename

@@ -15,3 +15,7 @@ Acceptance tests (must pass):
 - 18-point health check prints
 - PDF text is selectable (vector), map is the only raster
 - Scored CSV includes all required/derived fields, UTF-8
+
+
+
+py -m uvicorn engine.aps_api:app --reload

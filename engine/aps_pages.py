@@ -22,7 +22,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from io import BytesIO
 
-from aps_black_kit import (
+from engine.aps_black_kit import (
     APS_COLORS, add_teal_divider, get_black_kit_styles, 
     get_black_kit_table_style, apply_black_kit_to_plot
 )
@@ -422,7 +422,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from io import BytesIO
 
-from aps_black_kit import (
+from engine.aps_black_kit import (
     APS_COLORS, add_teal_divider, get_black_kit_styles, 
     get_black_kit_table_style, apply_black_kit_to_plot
 )

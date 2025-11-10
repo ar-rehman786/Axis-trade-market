@@ -1,15 +1,48 @@
-# Core dependencies for APS Market Intelligence Project
+# # Core dependencies for APS Market Intelligence Project
 
+pandas>=2.0.0
 numpy>=1.25.0
+
+# PDF Generation
 reportlab>=3.6.13
-openpyxl>=3.1.2
 matplotlib>=3.8.0
 
-# Optional (if project uses JSON/healthcheck APIs)
+# Excel Support (optional)
+openpyxl>=3.1.2
+
+# API Backend (NEW)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# HTTP Requests (for API integration)
 requests>=2.31.0
+httpx>=0.25.0
 
-# If you use data normalization or aliases mapping
+
+
+# Configuration
 pyyaml>=6.0.1
+python-dotenv>=1.0.0
 
+# Type Hints & Validation
+pydantic>=2.0.0
+typing-extensions>=4.8.0
 
-# installing command py -m pip install -r requirements.txt
+# Testing (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Development Tools (optional)
+black>=23.0.0
+flake8>=6.1.0
+
+# ==================== INSTALLATION ====================
+# Install all dependencies:
+#   py -m pip install -r requirements.txt
+#
+# Install only backend (API):
+#   py -m pip install fastapi uvicorn httpx
+#
+# Install only PDF generation:
+#   py -m pip install reportlab matplotlib pandas numpy
