@@ -1,0 +1,156 @@
+{
+  "info": {
+    "name": "APS Market Intelligence API",
+    "description": "Production API test collection - 3 core endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "aps-api-tests",
+    "version": "2.0.0"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Verify API is running"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Ingest CSV (Sample)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"market\": \"Raleigh\",\n  \"file_url\": \"https://raw.githubusercontent.com/your-repo/sample.csv\",\n  \"schema_version\": \"v2.0\",\n  \"chunk_rows\": 2000\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/ingest",
+          "host": ["{{base_url}}"],
+          "path": ["ingest"]
+        },
+        "description": "Ingest CSV file for processing. Returns job_id."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Job Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/job/{{job_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["job", "{{job_id}}"]
+        },
+        "description": "Check job processing status. Replace {{job_id}} with actual ID from ingest response."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get Feed Breakdown",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/feeds?job_id={{job_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["feeds"],
+          "query": [
+            {
+              "key": "job_id",
+              "value": "{{job_id}}"
+            }
+          ]
+        },
+        "description": "Get feed counts for completed job"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Download Report (PDF)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/report?job_id={{job_id}}&feed=core_equity&format=pdf",
+          "host": ["{{base_url}}"],
+          "path": ["report"],
+          "query": [
+            {
+              "key": "job_id",
+              "value": "{{job_id}}"
+            },
+            {
+              "key": "feed",
+              "value": "core_equity"
+            },
+            {
+              "key": "format",
+              "value": "pdf"
+            }
+          ]
+        },
+        "description": "Download PDF report for specific feed"
+      },
+      "response": []
+    },
+    {
+      "name": "Legacy: Get Pulse",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/pulse",
+          "host": ["{{base_url}}"],
+          "path": ["v1", "pulse"]
+        },
+        "description": "Legacy endpoint: Market health snapshot"
+      },
+      "response": []
+    },
+    {
+      "name": "Legacy: Market Intel by City",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/market-intel?city=Raleigh",
+          "host": ["{{base_url}}"],
+          "path": ["v1", "market-intel"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Raleigh"
+            }
+          ]
+        },
+        "description": "Legacy endpoint: Get city market data"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "your-job-id-here",
+      "type": "string"
+    }
+  ]
+}

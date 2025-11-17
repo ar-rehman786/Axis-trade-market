@@ -1,0 +1,337 @@
+openapi: 3.0.0
+info:
+  title: APS Market Intelligence API
+  description: |
+    Production REST API for market intelligence data processing.
+    
+    Features:
+    - File ingestion with chunked processing
+    - Feed-based routing (6 feed types)
+    - Automatic PDF generation per feed
+    - DNC/consent filtering
+    - Schema validation
+    
+  version: 2.0.0
+  contact:
+    name: APS Support
+    email: support@axistrademarket.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://api.axistrademarket.com
+    description: Production (Cloud Run)
+
+tags:
+  - name: Core
+    description: Health check and system status
+  - name: Ingestion
+    description: File upload and processing
+  - name: Jobs
+    description: Job tracking and status
+  - name: Reports
+    description: PDF report download
+  - name: Legacy
+    description: Backward compatibility endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - Core
+      summary: Health check
+      description: Verify API is running
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /ingest:
+    post:
+      tags:
+        - Ingestion
+      summary: Ingest CSV file
+      description: |
+        Upload CSV file for processing. Supports:
+        - Files with 1000+ rows
+        - Chunked processing (configurable)
+        - Alias mapping for column names
+        - Schema validation
+        - DNC/consent filtering
+        
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - market
+                - file_url
+              properties:
+                market:
+                  type: string
+                  description: Market name (e.g., "Raleigh", "Durham")
+                  example: "Raleigh"
+                file_url:
+                  type: string
+                  format: uri
+                  description: Public URL to CSV file
+                  example: "https://storage.googleapis.com/bucket/file.csv"
+                schema_version:
+                  type: string
+                  description: Schema version for validation
+                  default: "v2.0"
+                  example: "v2.0"
+                alias_map:
+                  type: object
+                  description: Custom column name mappings
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: string
+                chunk_rows:
+                  type: integer
+                  description: Rows per processing chunk
+                  default: 2000
+                  example: 2000
+
+      responses:
+        '200':
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+        '400':
+          description: Invalid request
+        '500':
+          description: Server error
+
+  /job/{job_id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get job status
+      description: Retrieve processing status and metrics for a job
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Job ID returned from /ingest
+
+      responses:
+        '200':
+          description: Job status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, processing, completed, failed]
+                  market:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  completed_at:
+                    type: string
+                    format: date-time
+                  progress:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  counts:
+                    type: object
+                    properties:
+                      total_rows:
+                        type: integer
+                      processed_rows:
+                        type: integer
+                      failed_rows:
+                        type: integer
+                      feeds:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                  error:
+                    type: string
+        '404':
+          description: Job not found
+
+  /feeds:
+    get:
+      tags:
+        - Jobs
+      summary: Get feed breakdown
+      description: Get row counts by feed type for a completed job
+      parameters:
+        - in: query
+          name: job_id
+          required: true
+          schema:
+            type: string
+          description: Job ID
+
+      responses:
+        '200':
+          description: Feed breakdown retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feeds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        feed:
+                          type: string
+                          example: "core_equity"
+                        count:
+                          type: integer
+                          example: 1200
+        '400':
+          description: Job not completed
+        '404':
+          description: Job not found
+
+  /report:
+    get:
+      tags:
+        - Reports
+      summary: Download report
+      description: Download PDF report for a specific feed
+      parameters:
+        - in: query
+          name: job_id
+          required: true
+          schema:
+            type: string
+          description: Job ID
+        - in: query
+          name: feed
+          required: true
+          schema:
+            type: string
+          description: Feed type (e.g., "core_equity")
+        - in: query
+          name: format
+          required: false
+          schema:
+            type: string
+            default: "pdf"
+          description: Output format (only "pdf" supported)
+
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid parameters
+        '404':
+          description: Report not found
+
+  /v1/pulse:
+    get:
+      tags:
+        - Legacy
+      summary: Market health snapshot (Legacy)
+      description: Quick market metrics for backward compatibility
+      responses:
+        '200':
+          description: Market pulse data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equity:
+                    type: number
+                  refi:
+                    type: number
+                  count:
+                    type: integer
+
+  /v1/market-intel:
+    get:
+      tags:
+        - Legacy
+      summary: Market intelligence (Legacy)
+      description: Get city or ZIP market data
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: City name
+        - in: query
+          name: zip
+          schema:
+            type: string
+          description: ZIP code
+
+      responses:
+        '200':
+          description: Market data
+        '400':
+          description: Missing parameters
+        '404':
+          description: Data not found
+
+components:
+  schemas:
+    IngestRequest:
+      type: object
+      required:
+        - market
+        - file_url
+      properties:
+        market:
+          type: string
+        file_url:
+          type: string
+          format: uri
+        schema_version:
+          type: string
+        alias_map:
+          type: object
+        chunk_rows:
+          type: integer
+
+    JobStatus:
+      type: object
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        counts:
+          type: object
+        error:
+          type: string
